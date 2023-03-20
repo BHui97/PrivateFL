@@ -7,7 +7,7 @@ from torchtext.datasets import SST2
 import numpy as np
 
 class CHMNIST(torch.utils.data.Dataset):
-    def __init__(self, root ='/home/yuchen/code/DPER_torch/CHMNIST',train=True, download=True, transform = None):
+    def __init__(self, root ='~/torch_data',train=True, download=True, transform = None):
         self.images = []
         self.root = root
         self.targets = []
