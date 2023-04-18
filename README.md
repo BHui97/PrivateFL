@@ -23,3 +23,4 @@ You can use 'linear_model', 'linear_model_DN" and 'linear_model_DN_IN" as FedAVG
 ```
 python FedTransfer.py
 ```
+Please reduce the value of 'max_physical_batch_size' in BatchMemoryManager (FedUser/LDPUser) if facing CUDA out of memory.
