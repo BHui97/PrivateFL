@@ -66,8 +66,7 @@ class CDPUser:
     def set_model_state_dict(self, weights):
         with torch.no_grad():
             for key, value in self.model.state_dict().items():
-                # if 'norm' not in key and 'bn' not in key and 'downsample.1' not in key:
-                if 'norm' not in key:
+                if 'norm' not in key and 'bn' not in key:
                     self.model.state_dict()[key].data.copy_(weights[key].detach().clone())
         self.model.to(self.device)
 
@@ -100,7 +99,7 @@ class LDPUser(CDPUser):
         self.model = self.model.to(self.device)
         self.model.train()
         for epoch in range(self.epochs):
-            with BatchMemoryManager(data_loader=self.train_dataloader, max_physical_batch_size=1, optimizer=self.optim) as batch_loader:
+            with BatchMemoryManager(data_loader=self.train_dataloader, max_physical_batch_size=8, optimizer=self.optim) as batch_loader:
                 for images, labels in batch_loader:
                     images, labels = images.to(self.device), labels.to(self.device)
                     self.optim.zero_grad()
