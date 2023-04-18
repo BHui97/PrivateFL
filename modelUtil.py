@@ -38,7 +38,7 @@ class resnet18(torch.nn.Module):
     """
     def __init__(self, num_classes):
         super().__init__()
-        self.backbone = torchvision.models.resnet34(pretrained=True)
+        self.backbone = torchvision.models.resnet18(pretrained=True)
         n_ftrs = self.backbone.fc.in_features
         self.backbone.fc = torch.nn.Linear(n_ftrs, num_classes)
     def forward(self, x):
@@ -50,7 +50,7 @@ class resnet18_IN(torch.nn.Module):
     """
     def __init__(self, num_classes):
         super().__init__()
-        self.backbone = torchvision.models.resnet34(pretrained=True)
+        self.backbone = torchvision.models.resnet18(pretrained=True)
         n_ftrs = self.backbone.fc.in_features
         self.backbone.fc = torch.nn.Linear(n_ftrs, num_classes)
         self.norm = InputNorm(3, 120)
@@ -202,8 +202,8 @@ class linear_model_DN_IN(nn.Module):
         if not bn_stats:
             self.bn_stats = (torch.zeros(input_shape), torch.ones(input_shape))
         else:
-            mean = np.load('/home/bo/Projects/DPER_torch/transfer/cifar100_resnext_mean.npy')
-            var = np.load('/home/bo/Projects/DPER_torch/transfer/cifar100_resnext_var.npy')
+            mean = np.load('transfer/cifar100_resnext_mean.npy')
+            var = np.load('transfer/cifar100_resnext_var.npy')
             self.bn_stats = (torch.from_numpy(mean), torch.from_numpy(var))
         self.backbone = nn.Linear(input_shape, num_classes, bias=True)
         # self.norm = InputPolyNorm((1, input_shape))
