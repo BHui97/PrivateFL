@@ -34,7 +34,7 @@ class CDPServer:
         with torch.no_grad():
             norms = self.get_median_norm(weights)
             for k, v in self.get_model_state_dict().items():
-                if 'bn' not in k and 'norm' not in k:
+                if 'bn' not in k and 'norm' not in k and 'downsample.1' not in k:
                     sumed_grad = torch.zeros_like(v)
                     for i in range(len(weights)):
                         grad = weights[i][k]-v
@@ -56,7 +56,7 @@ class LDPServer(CDPServer):
     def agg_updates(self, weights):
         with torch.no_grad():
             for k, v in self.get_model_state_dict().items():
-                if 'bn' not in k and 'norm' not in k:
+                if 'bn' not in k and 'norm' not in k and 'downsample.1' not in k:
                     sumed_grad = torch.zeros_like(v)
                     for i in range(len(weights)):
                         grad = weights[i][k]-v

@@ -14,11 +14,11 @@ NUM_CLIENTS = 100
 NUM_CLASSES = 10
 NUM_CLASES_PER_CLIENT= 2
 MODEL = sys.argv[1]
-MODE = "CDP"
+MODE = "LDP"
 EPOCHS = 1
 ROUNDS = int(sys.argv[2])
 BATCH_SIZE = 64
-LEARNING_RATE_DIS = 5e-3
+LEARNING_RATE_DIS = 1e-1
 target_epsilon = int(sys.argv[3])
 target_delta = 1e-3
 sample_rate=1
@@ -51,13 +51,16 @@ for i in range(NUM_CLIENTS):
 for round in range(ROUNDS):
     random_index = np.random.choice(NUM_CLIENTS, int(sample_rate*NUM_CLIENTS), replace=False)
     for index in random_index:users[index].train()
-    server.agg_updates([users[index].get_model_state_dict() for index in random_index])
-    for i in range(NUM_CLIENTS):
-        users[i].set_model_state_dict(server.get_model_state_dict())
+    if MODE == "LDP":
+        weights_agg = agg_weights([users[index].get_model_state_dict() for index in random_index])
+        for i in range(NUM_CLIENTS):
+            users[i].set_model_state_dict(weights_agg)
+    else:
+        server.agg_updates([users[index].get_model_state_dict() for index in random_index])
+        for i in range(NUM_CLIENTS):
+            users[i].set_model_state_dict(server.get_model_state_dict())
     print(f"Round: {round+1}")
     evaluate_global(users, test_dataloaders, range(NUM_CLIENTS))
-    if round == ROUNDS-1:
-        torch.save(weights_agg, f'weights/{DATA_NAME}_{MODEL}_{MODE}.pth')
     if MODE == "LDP":
         eps = max([user.epsilon for user in users])
         print(f"Epsilon: {eps}")
