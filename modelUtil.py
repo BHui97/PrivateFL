@@ -12,6 +12,15 @@ from numpy import median
 import numpy as np
 import torch.nn.functional as func
 
+def agg_weights(weights):
+    with torch.no_grad():
+        weights_avg = copy.deepcopy(weights[0])
+        for k in weights_avg.keys():
+            for i in range(1, len(weights)):
+                weights_avg[k] += weights[i][k]
+            weights_avg[k] = torch.div(weights_avg[k], len(weights))
+    return weights_avg
+
 def evaluate_global(users, test_dataloders, users_index):
     testing_corrects = 0
     testing_sum = 0
@@ -25,14 +34,17 @@ def evaluate_global(users, test_dataloders, users_index):
 class InputNorm(nn.Module):
     def __init__(self, num_channel, num_feature):
         super().__init__()
-        self.gamma = nn.Parameter(torch.ones(1, num_channel, 1, 1))
+        self.num_channel = num_channel
+        self.gamma = nn.Parameter(torch.ones(num_channel))
         self.beta = nn.Parameter(torch.zeros(num_channel, num_feature, num_feature))
     def forward(self, x):
-        x = self.gamma*x
-        x = x+ self.beta
-        return  x
-
-
+        if self.num_channel == 1:
+            x = self.gamma*x
+            x = x + self.beta
+            return  x  
+        if self.num_channel == 3:
+            return torch.einsum('...ijk, i->...ijk', x, self.gamma) + self.beta
+        
 class resnet18(torch.nn.Module):
     """Constructs a ResNet-18 model.
     """
@@ -101,8 +113,8 @@ class mnist_fully_connected_IN(nn.Module):
         self.norm = InputNorm(1, 28)
 
     def forward(self,x):
-        x = x.view(-1, 28 * 28)
         x = self.norm(x)
+        x = x.view(-1, 28 * 28)
         x = relu(self.fc1(x))
         x = relu(self.fc2(x))
         logits = self.fc3(x)
