@@ -3,25 +3,50 @@ from datasets import *
 from FedUser import CDPUser, LDPUser, opacus
 from FedServer import LDPServer, CDPServer
 from datetime import date
-import logging
-import os
-import sys
+import argparse
+
+import time
+
+start_time = time.time()
+
+def parse_arguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data', type=str, default='mnist',
+                        choices=['mnist','cifar10','cifar100','fashionmnist','emnist','purchase','chmnist'])
+    parser.add_argument('--nclient', type=int, default= 100)
+    parser.add_argument('--nclass', type=int, help= 'the number of class for this dataset', default= 10)
+    parser.add_argument('--ncpc', type=int, help= 'the number of class assigned to each client', default=2)
+    parser.add_argument('--model', type=str, default='mnist_fully_connected_IN', choices = ['mnist_fully_connected_IN', 'resnet18_IN', 'alexnet_IN', 'purchase_fully_connected_IN'])
+    parser.add_argument('--mode', type=str, default= 'LDP')
+    parser.add_argument('--round',  type = int, default= 150)
+    parser.add_argument('--epsilon', type=int, default=8)
+    parser.add_argument('--sr',  type=float, default=1.0,
+                        help='sample rate in each round')
+    parser.add_argument('--lr',  type=float, default=1e-1,
+                        help='learning rate')
+    parser.add_argument('--flr',  type=float, default=1e-1,
+                        help='learning rate')
+    args = parser.parse_args()
+    return args
+
+args = parse_arguments()
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 today = date.today().isoformat()
-DATA_NAME = "cifar"
-NUM_CLIENTS = 100
-NUM_CLASSES = 10
-NUM_CLASES_PER_CLIENT= 2
-MODEL = sys.argv[1]
-MODE = "LDP"
+DATA_NAME = args.data
+NUM_CLIENTS = args.nclient
+NUM_CLASSES = args.nclass
+NUM_CLASES_PER_CLIENT= args.ncpc
+MODEL = args.model
+MODE = args.mode
 EPOCHS = 1
-ROUNDS = int(sys.argv[2])
+ROUNDS = args.round
 BATCH_SIZE = 64
-LEARNING_RATE_DIS = 1e-1
-target_epsilon = int(sys.argv[3])
+LEARNING_RATE_DIS = args.lr
+LEARNING_RATE_F = args.flr
+target_epsilon = args.epsilon
 target_delta = 1e-3
-sample_rate=1
+sample_rate=args.sr
 
 user_param = {'disc_lr': LEARNING_RATE_DIS, 'epochs': EPOCHS}
 server_param = {}
@@ -37,7 +62,7 @@ elif MODE == "CDP":
     server_param['noise_multiplier'] = opacus.accountants.utils.get_noise_multiplier(target_epsilon=target_epsilon,
                                                                                  target_delta=target_delta, 
                                                                                  sample_rate=sample_rate, steps=ROUNDS)
-    print(server_param['noise_multiplier'])
+    print(f"noise_multipier: {server_param['noise_multiplier']}")
     server_param['sample_clients'] = sample_rate*NUM_CLIENTS
 else:
     raise ValueError("Choose mode from [CDP, LDP]")
@@ -64,3 +89,5 @@ for round in range(ROUNDS):
     if MODE == "LDP":
         eps = max([user.epsilon for user in users])
         print(f"Epsilon: {eps}")
+end_time = time.time()
+print("Use time: {:.2f}s".format(end_time - start_time))

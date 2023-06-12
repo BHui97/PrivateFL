@@ -137,6 +137,37 @@ class mnist_fully_connected(nn.Module):
         logits = self.fc3(x)
         return logits, softmax(logits,dim=1)
 
+class purchase_fully_connected(nn.Module):
+    def __init__(self,num_classes):
+        super(purchase_fully_connected, self).__init__()
+        self.fc1 = nn.Linear(600, 512,bias=False)
+        self.fc2 = nn.Linear(512, 256,bias=False)
+        self.fc3 = nn.Linear(256, 128,bias=False)
+        self.fc4 = nn.Linear(128, num_classes,bias=False)
+
+
+    def forward(self,x):
+        x = tanh(self.fc1(x))
+        x = tanh(self.fc2(x))
+        x = tanh(self.fc3(x))
+        logits = self.fc4(x)
+        return logits, softmax(logits,dim=1)
+
+class purchase_fully_connected_IN(nn.Module):
+    def __init__(self,num_classes):
+        super(purchase_fully_connected_IN, self).__init__()
+        self.fc1 = nn.Linear(600,512, bias=False)
+        self.fc2 = nn.Linear(512, 256, bias=False)
+        self.fc3 = nn.Linear(256, 128, bias=False)
+        self.fc4 = nn.Linear(128, num_classes, bias=False)
+        self.norm = FeatureNorm(600)
+    def forward(self,x):
+        x = self.norm(x)
+        x = tanh(self.fc1(x))
+        x = tanh(self.fc2(x))
+        x = tanh(self.fc3(x))
+        logits = self.fc4(x)
+        return logits, softmax(logits,dim=1)
 
 class linear_model(nn.Module):
     def __init__(self, num_classes, input_shape=512):

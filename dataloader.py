@@ -3,11 +3,10 @@ import torch.utils.data
 from PIL import Image
 from sklearn.model_selection import train_test_split
 import pandas as pd
-from torchtext.datasets import SST2
 import numpy as np
 
 class CHMNIST(torch.utils.data.Dataset):
-    def __init__(self, root ='~/torch_data',train=True, download=True, transform = None):
+    def __init__(self, root ='data/CHMNIST',train=True, download=True, transform = None):
         self.images = []
         self.root = root
         self.targets = []
@@ -53,7 +52,7 @@ class CHMNIST(torch.utils.data.Dataset):
 
 
 class Purchase(torch.utils.data.Dataset):
-    def __init__(self, root ='purchase/dataset_purchase',train=True, download=True, transform = None):
+    def __init__(self, root ='data/purchase/dataset_purchase',train=True, download=True, transform = None):
         self.images = []
         self.root = root
         self.targets = []

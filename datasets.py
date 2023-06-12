@@ -1,10 +1,10 @@
 import random
 from collections import defaultdict
-
 import numpy as np
 import torch.utils.data
 import torchvision.transforms as transforms
-from torchvision.datasets import CIFAR10, MNIST, CelebA, CIFAR100
+from torchvision.datasets import CIFAR10, MNIST, FashionMNIST, CIFAR100, EMNIST
+from dataloader import *
 np.random.seed(2022)
 
 def get_datasets(data_name, dataroot, preprocess = None):
@@ -17,7 +17,7 @@ def get_datasets(data_name, dataroot, preprocess = None):
     :return: train_set, val_set, test_set (tuple of pytorch dataset/subset)
     """
 
-    if data_name =='cifar':
+    if data_name =='cifar10':
         normalization = transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         transform = transforms.Compose([transforms.ToTensor(), transforms.Resize(120), normalization]) if preprocess==None else preprocess
 
@@ -47,7 +47,7 @@ def get_datasets(data_name, dataroot, preprocess = None):
         transform = transforms.Compose([transforms.ToTensor(), transforms.Resize((150,150)),normalization])
         data_obj = CHMNIST
     else:
-        raise ValueError("choose data_name from ['mnist', 'cifar', 'cifar100', 'fashionmnist', 'emnist, 'purchase', 'chmnist]")
+        raise ValueError("choose data_name from ['mnist', 'cifar10', 'cifar100', 'fashionmnist', 'emnist, 'purchase', 'chmnist']")
 
     train_set = data_obj(
         dataroot,
@@ -104,7 +104,7 @@ def gen_classes_per_node(dataset, num_users, classes_per_user=2, high_prob=0.6, 
     # -------------------------------------------#
     # Divide classes + num samples for each user #
     # -------------------------------------------#
-    print(num_classes)
+    # print(num_classes)
     assert (classes_per_user * num_users) % num_classes == 0, "equal classes appearance is needed"
     count_per_class = (classes_per_user * num_users) // num_classes
     class_dict = {}
