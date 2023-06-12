@@ -1,14 +1,33 @@
 # PrivateFL: Accurate, Differentially Private Federated Learning via Personalized Data Transformation
 
-This is Pytorch implementaion of our paper, PrivateFL: Accurate, Differentially Private Federated Learning via Personalized Data Transformation.
+This is the Pytorch implementaion of our paper, PrivateFL: Accurate, Differentially Private Federated Learning via Personalized Data Transformation.
+
+## Experiment Setup
+
+We use miniconda to create a virtual environment with python 3.8, you can install miniconda use the following script if you are using Linux-x86-64bit machine:
+
+(Optional for install miniconda)
+```bash
+cd script &&
+bash install_conda.sh
+```
+
+Then use the following script to download the requirements:
+```bash
+cd script &&
+bash setup.sh
+```
 
 ## Code Usage
 ### Train from scratch
-You can choose model from modelUtil.py, set #round and #epsilon. You can also modify the parameters like #NUM_CLIENTS,#NUM_CLASSES_PER_CLIENT, #Delta, etc. in FedAverage.py.
+You can use the following script to train from scratch. 
 
 ```bash
-python FedAverage.py [model_name] [round] [episilon]
+cd script &&
+bash train.sh
 ```
+
+You can also change the parameters in script/train.sh, e.g., --data --nclient --nclass --ncpc --model --mode --round --epsilon --sr --lr, following the choices listed in parse_arguments() of FedAverage.py. The value of the parameters can be found in our paper.
 
 
 ### Train with frozen encoder
