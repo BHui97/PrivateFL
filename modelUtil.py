@@ -193,7 +193,7 @@ def standardize(x, bn_stats):
     return x
 
 class linear_model_DN(nn.Module):
-    def __init__(self, num_classes, input_shape=512, bn_stats=False):
+    def __init__(self, num_classes, input_shape=224, bn_stats=False):
         super(linear_model_DN, self).__init__()
         if not bn_stats:
             self.bn_stats = (torch.zeros(input_shape), torch.ones(input_shape))
@@ -217,7 +217,7 @@ class FeatureNorm(nn.Module):
 
     def forward(self, x):
         x = torch.einsum('ni, j->ni', x, self.gamma) 
-        x = x+ self.beta
+        x = x + self.beta
         return  x
 
 
@@ -249,7 +249,6 @@ class linear_model_DN_IN(nn.Module):
             var = np.load('transfer/cifar100_resnext_var.npy')
             self.bn_stats = (torch.from_numpy(mean), torch.from_numpy(var))
         self.backbone = nn.Linear(input_shape, num_classes, bias=True)
-        # self.norm = InputPolyNorm((1, input_shape))
         self.norm = FeatureNorm(input_shape)
     def forward(self,x):
         x = self.norm(x)

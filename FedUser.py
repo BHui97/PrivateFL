@@ -75,7 +75,7 @@ class CDPUser:
                 self.model.state_dict()[key].data.copy_(weights[key])
 
 class LDPUser(CDPUser):
-    def __init__(self, index, device, model, n_classes, train_dataloader, epochs, rounds, target_epsilon, target_delta, max_norm=2.0, disc_lr=5e-1):
+    def __init__(self, index, device, model, n_classes, train_dataloader, epochs, rounds, target_epsilon, target_delta, max_norm=2.0, disc_lr=5e-1, mp_bs = 3):
         super().__init__(index, device, model, n_classes, train_dataloader, epochs=epochs, max_norm=max_norm, disc_lr=disc_lr)
         self.rounds = rounds
         self.target_epsilon = target_epsilon
@@ -85,6 +85,7 @@ class LDPUser(CDPUser):
         self.optim = torch.optim.SGD(self.model.parameters(), self.disc_lr)
         self.make_local_private()
         self.agg = True
+        self.mp_bs = mp_bs
         if "IN" in model:
             self.agg = False
 
@@ -98,7 +99,7 @@ class LDPUser(CDPUser):
         self.model = self.model.to(self.device)
         self.model.train()
         for epoch in range(self.epochs):
-            with BatchMemoryManager(data_loader=self.train_dataloader, max_physical_batch_size=3, optimizer=self.optim) as batch_loader:
+            with BatchMemoryManager(data_loader=self.train_dataloader, max_physical_batch_size=self.mp_bs, optimizer=self.optim) as batch_loader:
                 for images, labels in batch_loader:
                     images, labels = images.to(self.device), labels.to(self.device)
                     self.optim.zero_grad()

@@ -4,7 +4,6 @@ from FedUser import CDPUser, LDPUser, opacus
 from FedServer import LDPServer, CDPServer
 from datetime import date
 import argparse
-
 import time
 
 start_time = time.time()
@@ -20,6 +19,7 @@ def parse_arguments():
     parser.add_argument('--mode', type=str, default= 'LDP')
     parser.add_argument('--round',  type = int, default= 150)
     parser.add_argument('--epsilon', type=int, default=8)
+    parser.add_argument('--physical_bs', type = int, default=3, help= 'the max_physical_batch_size of Opacus LDP, decrease if cuda out of memory')
     parser.add_argument('--sr',  type=float, default=1.0,
                         help='sample rate in each round')
     parser.add_argument('--lr',  type=float, default=1e-1,
@@ -44,6 +44,7 @@ ROUNDS = args.round
 BATCH_SIZE = 64
 LEARNING_RATE_DIS = args.lr
 LEARNING_RATE_F = args.flr
+mp_bs = args.physical_bs
 target_epsilon = args.epsilon
 target_delta = 1e-3
 sample_rate=args.sr
@@ -56,9 +57,11 @@ if MODE == "LDP":
     user_param['rounds'] = ROUNDS
     user_param['target_epsilon'] = target_epsilon
     user_param['target_delta'] = target_delta
+    user_param['mp_bs'] = mp_bs
 elif MODE == "CDP":
     user_obj = CDPUser
     server_obj = CDPServer
+    user_param['flr'] = LEARNING_RATE_F
     server_param['noise_multiplier'] = opacus.accountants.utils.get_noise_multiplier(target_epsilon=target_epsilon,
                                                                                  target_delta=target_delta, 
                                                                                  sample_rate=sample_rate, steps=ROUNDS)
