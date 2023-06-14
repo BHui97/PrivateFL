@@ -1,15 +1,15 @@
 from modelUtil import *
 from collections import OrderedDict
-import torchmetrics
 import opacus
 from opacus.validators import ModuleValidator
-from opacus.utils.batch_memory_manager import BatchMemoryManager
-from opacus.optimizers.optimizer import DPOptimizer
-import numpy as np
+
 
 class CDPServer:
-    def __init__(self, device, model, n_classes, noise_multiplier=1, sample_clients=10, disc_lr=1):
-        self.model = globals()[model](num_classes=n_classes)
+    def __init__(self, device, model, input_shape, n_classes, noise_multiplier=1, sample_clients=10, disc_lr=1):
+        if 'linear_model' in model:
+            self.model = globals()[model](num_classes=n_classes, input_shape=input_shape)
+        else:
+            self.model = globals()[model](num_classes=n_classes)
         self.disc_lr = disc_lr
         self.device = device
         self.sample_clients = sample_clients
@@ -62,8 +62,8 @@ class CDPServer:
 
 
 class LDPServer(CDPServer):
-    def __init__(self, device, model, n_classes, noise_multiplier=1, sample_clients=10, disc_lr=1):
-        super().__init__(device, model, n_classes, noise_multiplier, sample_clients, disc_lr)
+    def __init__(self, device, model, n_classes, input_shape, noise_multiplier=1, sample_clients=10, disc_lr=1):
+        super().__init__(device, model, n_classes, input_shape, noise_multiplier, sample_clients, disc_lr)
         self.model = ModuleValidator.fix(self.model)
         self.privacy_engine = opacus.PrivacyEngine()
         self.model = self.privacy_engine._prepare_model(self.model)

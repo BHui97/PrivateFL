@@ -8,9 +8,15 @@ import numpy as np
 import time
 
 class CDPUser:
-    def __init__(self, index, device, model, n_classes, train_dataloader, epochs, max_norm=1.0, disc_lr=5e-3, flr = 1e-1):
+    def __init__(self, index, device, model, input_shape, n_classes, train_dataloader, epochs, max_norm=1.0, disc_lr=5e-3, flr = 1e-1):
         self.index = index
-        self.model = globals()[model](num_classes=n_classes)
+        if 'linear_model' in model:
+            if input_shape == 1024:
+                self.model = globals()[model](num_classes=n_classes, input_shape=input_shape, bn_stats=True)
+            else:
+                self.model = globals()[model](num_classes=n_classes, input_shape=input_shape, bn_stats=False)
+        else:
+            self.model = globals()[model](num_classes=n_classes)
         self.train_dataloader = train_dataloader
         self.loss_fn = torch.nn.CrossEntropyLoss()
         self.disc_lr = disc_lr
@@ -75,25 +81,27 @@ class CDPUser:
                 self.model.state_dict()[key].data.copy_(weights[key])
 
 class LDPUser(CDPUser):
-    def __init__(self, index, device, model, n_classes, train_dataloader, epochs, rounds, target_epsilon, target_delta, max_norm=2.0, disc_lr=5e-1, mp_bs = 3):
-        super().__init__(index, device, model, n_classes, train_dataloader, epochs=epochs, max_norm=max_norm, disc_lr=disc_lr)
+    def __init__(self, index, device, model, n_classes, input_shape, train_dataloader, epochs, rounds, target_epsilon, target_delta, sr, max_norm=2.0, disc_lr=5e-1, mp_bs = 3):
+        super().__init__(index, device, model, n_classes, input_shape, train_dataloader, epochs=epochs, max_norm=max_norm, disc_lr=disc_lr)
         self.rounds = rounds
         self.target_epsilon = target_epsilon
         self.epsilon = 0
         self.delta = target_delta
         self.model = ModuleValidator.fix(self.model)
         self.optim = torch.optim.SGD(self.model.parameters(), self.disc_lr)
+        self.sr = sr
         self.make_local_private()
         self.agg = True
         self.mp_bs = mp_bs
+
         if "IN" in model:
             self.agg = False
 
     def make_local_private(self):
         self.privacy_engine = opacus.PrivacyEngine()
-        self.model, self.optim, self.train_dataloader = self.privacy_engine.make_private_with_epsilon(module=self.model, optimizer=self.optim, 
-                                                                                                      data_loader=self.train_dataloader, epochs=self.epochs*self.rounds, 
-                                                                                                      target_epsilon=self.target_epsilon, target_delta=self.delta, 
+        self.model, self.optim, self.train_dataloader = self.privacy_engine.make_private_with_epsilon(module=self.model, optimizer=self.optim,
+                                                                                                      data_loader=self.train_dataloader, epochs=self.epochs*self.rounds*self.sr,
+                                                                                                      target_epsilon=self.target_epsilon, target_delta=self.delta,
                                                                                                       max_grad_norm=self.max_norm)
     def train(self):
         self.model = self.model.to(self.device)

@@ -57,6 +57,7 @@ if MODE == "LDP":
     user_param['rounds'] = ROUNDS
     user_param['target_epsilon'] = target_epsilon
     user_param['target_delta'] = target_delta
+    user_param['sr'] = sample_rate
     user_param['mp_bs'] = mp_bs
 elif MODE == "CDP":
     user_obj = CDPUser
@@ -72,8 +73,10 @@ else:
 
 train_dataloaders, test_dataloaders = gen_random_loaders(DATA_NAME, '~/torch_data', NUM_CLIENTS,
                                                          BATCH_SIZE, NUM_CLASES_PER_CLIENT, NUM_CLASSES)
-users = [user_obj(i, device, MODEL, NUM_CLASSES, train_dataloaders[i], **user_param) for i in range(NUM_CLIENTS)]
-server = server_obj(device, MODEL, NUM_CLASSES, **server_param)
+
+print(user_param)
+users = [user_obj(i, device, MODEL, None, NUM_CLASSES, train_dataloaders[i], **user_param) for i in range(NUM_CLIENTS)]
+server = server_obj(device, MODEL, None, NUM_CLASSES, **server_param)
 for i in range(NUM_CLIENTS):
     users[i].set_model_state_dict(server.get_model_state_dict())
 for round in range(ROUNDS):
@@ -92,5 +95,7 @@ for round in range(ROUNDS):
     if MODE == "LDP":
         eps = max([user.epsilon for user in users])
         print(f"Epsilon: {eps}")
+        if eps > target_epsilon:
+            break
 end_time = time.time()
 print("Use time: {:.2f}s".format(end_time - start_time))
