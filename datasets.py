@@ -49,18 +49,36 @@ def get_datasets(data_name, dataroot, preprocess = None):
     else:
         raise ValueError("choose data_name from ['mnist', 'cifar10', 'cifar100', 'fashionmnist', 'emnist, 'purchase', 'chmnist']")
 
-    train_set = data_obj(
-        dataroot,
-        train=True,
-        transform=transform,
-        download=True
-    )
 
-    test_set = data_obj(
-        dataroot,
-        train=False,
-        transform=transform
-    )
+    if data_name == 'emnist':
+        train_set = data_obj(
+            dataroot,
+            train=True,
+            transform=transform,
+            split='digits',
+            download=True
+        )
+
+        test_set = data_obj(
+            dataroot,
+            train=False,
+            split='digits',
+            transform=transform
+        )
+
+    else:
+        train_set = data_obj(
+            dataroot,
+            train=True,
+            transform=transform,
+            download=True
+        )
+
+        test_set = data_obj(
+            dataroot,
+            train=False,
+            transform=transform
+        )
 
     return train_set, test_set
 

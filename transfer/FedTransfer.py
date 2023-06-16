@@ -8,6 +8,7 @@ import numpy as np
 import argparse
 import time
 import os
+import pandas as pd
 
 
 start_time = time.time()
@@ -31,6 +32,8 @@ def parse_arguments():
     parser.add_argument('--flr',  type=float, default=5e-2,
                         help='learning rate')
     parser.add_argument('--physical_bs', type = int, default=4, help= 'the max_physical_batch_size of Opacus LDP, decrease to 1 if cuda out of memory')
+    parser.add_argument('--E',  type=int, default=2,
+                        help='the index of experiment in AE')
     args = parser.parse_args()
     return args
 
@@ -58,6 +61,8 @@ if ENCODER == "simclr": IN_SHAPE = 2048
 elif ENCODER == "resnext": IN_SHAPE = 1024
 elif ENCODER == "clip": IN_SHAPE = 512
 else: IN_SHAPE = None
+
+os.makedirs(f'../log/E{args.E}', exist_ok=True)
 
 if os.path.exists(f'feature/{DATA_NAME}_{NUM_CLASES_PER_CLIENT}cpc_{NUM_CLIENTS}client_{ENCODER}/{NUM_CLIENTS-1}_test_x.npy') == False:
     extract(DATA_NAME, NUM_CLIENTS, NUM_CLASSES, NUM_CLASES_PER_CLIENT, ENCODER, BATCH_SIZE, preprocess = None)
@@ -100,6 +105,7 @@ users = [user_obj(i, device, MODEL, IN_SHAPE, NUM_CLASSES, train_dataloaders[i],
 server = server_obj(device, MODEL, IN_SHAPE, NUM_CLASSES, **server_param)
 for i in range(NUM_CLIENTS):
     users[i].set_model_state_dict(server.get_model_state_dict())
+best_acc = 0
 for round in range(ROUNDS):
     random_index = np.random.choice(NUM_CLIENTS, int(sample_rate*NUM_CLIENTS), replace=False)
     for index in random_index:users[index].train()
@@ -112,9 +118,22 @@ for round in range(ROUNDS):
         for i in range(NUM_CLIENTS):
             users[i].set_model_state_dict(server.get_model_state_dict())
     print(f"Round: {round+1}")
-    evaluate_global(users, test_dataloaders, range(NUM_CLIENTS))
+    acc = evaluate_global(users, test_dataloaders, range(NUM_CLIENTS))
+    if acc > best_acc:
+        best_acc = acc
     if MODE == "LDP":
         eps = max([user.epsilon for user in users])
         print(f"Epsilon: {eps}")
+        if eps > target_epsilon:
+            break
+
 end_time = time.time()
-print("Use time: {:.2f}s".format(end_time - start_time))
+print("Use time: {:.2f}h".format((end_time - start_time)/3600.0))
+print(f'Best accuracy: {best_acc}')
+results_df = pd.DataFrame(columns=["data","num_client","ncpc","mode","model","epsilon","accuracy"])
+results_df = results_df._append(
+    {"data": DATA_NAME, "num_client": NUM_CLIENTS,
+     "ncpc": NUM_CLASES_PER_CLIENT, "mode":MODE,
+     "model": ENCODER, "epsilon": target_epsilon, "accuracy": best_acc},
+    ignore_index=True)
+results_df.to_csv(f'../log/E{args.E}/{DATA_NAME}_{NUM_CLIENTS}_{NUM_CLASES_PER_CLIENT}_{MODE}_{ENCODER}_{target_epsilon}.csv', index=False)

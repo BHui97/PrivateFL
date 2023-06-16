@@ -29,6 +29,7 @@ def evaluate_global(users, test_dataloders, users_index):
         testing_corrects += corrects
         testing_sum += num
     print(f"Acc: {testing_corrects / testing_sum}")
+    return (testing_corrects / testing_sum)
 
 
 class InputNorm(nn.Module):
