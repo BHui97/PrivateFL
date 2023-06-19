@@ -74,7 +74,13 @@ elif MODE == "CDP":
 else:
     raise ValueError("Choose mode from [CDP, LDP]")
 
-train_dataloaders, test_dataloaders = gen_random_loaders(DATA_NAME, '~/torch_data', NUM_CLIENTS,
+if DATA_NAME == 'purchase':
+    root = 'data/purchase/dataset_purchase'
+elif DATA_NAME == 'chmnist':
+    root = 'data/CHMNIST'
+else: root = '~/torch_data'
+
+train_dataloaders, test_dataloaders = gen_random_loaders(DATA_NAME, root, NUM_CLIENTS,
                                                          BATCH_SIZE, NUM_CLASES_PER_CLIENT, NUM_CLASSES)
 
 print(user_param)

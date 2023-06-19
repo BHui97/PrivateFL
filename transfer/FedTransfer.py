@@ -34,6 +34,8 @@ def parse_arguments():
     parser.add_argument('--physical_bs', type = int, default=4, help= 'the max_physical_batch_size of Opacus LDP, decrease to 1 if cuda out of memory')
     parser.add_argument('--E',  type=int, default=2,
                         help='the index of experiment in AE')
+    parser.add_argument('--bs',  type=int, default=64,
+                        help='batch size')
     args = parser.parse_args()
     return args
 
@@ -49,7 +51,8 @@ MODEL = args.model
 MODE = args.mode
 EPOCHS = 1
 ROUNDS = args.round
-BATCH_SIZE = 64
+BATCH_SIZE = args.bs
+    #256
 LEARNING_RATE_DIS = args.lr
 LEARNING_RATE_F = args.flr
 target_epsilon = args.epsilon
@@ -64,8 +67,9 @@ else: IN_SHAPE = None
 
 os.makedirs(f'../log/E{args.E}', exist_ok=True)
 
-if os.path.exists(f'feature/{DATA_NAME}_{NUM_CLASES_PER_CLIENT}cpc_{NUM_CLIENTS}client_{ENCODER}/{NUM_CLIENTS-1}_test_x.npy') == False:
-    extract(DATA_NAME, NUM_CLIENTS, NUM_CLASSES, NUM_CLASES_PER_CLIENT, ENCODER, BATCH_SIZE, preprocess = None)
+feature_path = f'feature/{DATA_NAME}_{NUM_CLASES_PER_CLIENT}cpc_{NUM_CLIENTS}client_{ENCODER}_{BATCH_SIZE}'
+if os.path.exists(f'{feature_path}/{NUM_CLIENTS-1}_test_x.npy') == False:
+    extract(DATA_NAME, NUM_CLIENTS, NUM_CLASSES, NUM_CLASES_PER_CLIENT, ENCODER, BATCH_SIZE, preprocess = None, path=feature_path)
 
 user_param = {'disc_lr': LEARNING_RATE_DIS, 'epochs': EPOCHS}
 server_param = {}
@@ -89,10 +93,10 @@ elif MODE == "CDP":
 else:
     raise ValueError("Choose mode from [CDP, LDP]")
 
-x_train = [np.load(f"feature/{DATA_NAME}_{NUM_CLASES_PER_CLIENT}cpc_{NUM_CLIENTS}client_{ENCODER}/{index}_train_x.npy") for index in range(NUM_CLIENTS)]
-y_train = [np.load(f"feature/{DATA_NAME}_{NUM_CLASES_PER_CLIENT}cpc_{NUM_CLIENTS}client_{ENCODER}/{index}_train_y.npy") for index in range(NUM_CLIENTS)]
-x_test = [np.load(f"feature/{DATA_NAME}_{NUM_CLASES_PER_CLIENT}cpc_{NUM_CLIENTS}client_{ENCODER}/{index}_test_x.npy") for index in range(NUM_CLIENTS)]
-y_test = [np.load(f"feature/{DATA_NAME}_{NUM_CLASES_PER_CLIENT}cpc_{NUM_CLIENTS}client_{ENCODER}/{index}_test_y.npy") for index in range(NUM_CLIENTS)]
+x_train = [np.load(f"{feature_path}/{index}_train_x.npy") for index in range(NUM_CLIENTS)]
+y_train = [np.load(f"{feature_path}/{index}_train_y.npy") for index in range(NUM_CLIENTS)]
+x_test = [np.load(f"{feature_path}/{index}_test_x.npy") for index in range(NUM_CLIENTS)]
+y_test = [np.load(f"{feature_path}/{index}_test_y.npy") for index in range(NUM_CLIENTS)]
 
 
 trainsets = [torch.utils.data.TensorDataset(torch.from_numpy(x_train[index]), torch.from_numpy(y_train[index])) for index in range(NUM_CLIENTS)]

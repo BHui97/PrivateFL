@@ -8,7 +8,7 @@ from CLIP import clip
 from tqdm import tqdm
 from collections import OrderedDict
 
-def extract(DATA_NAME, NUM_CLIENTS, NUM_CLASSES, NUM_CLASES_PER_CLIENT, ENCODER, BATCH_SIZE, preprocess = None):
+def extract(DATA_NAME, NUM_CLIENTS, NUM_CLASSES, NUM_CLASES_PER_CLIENT, ENCODER, BATCH_SIZE,  preprocess = None, path = None):
     if ENCODER == "simclr":
         weight_path = 'https://pl-bolts-weights.s3.us-east-2.amazonaws.com/simclr/bolts_simclr_imagenet/simclr_imagenet.ckpt'
         simclr = SimCLR.load_from_checkpoint(weight_path, strict=False)
@@ -29,7 +29,7 @@ def extract(DATA_NAME, NUM_CLIENTS, NUM_CLASSES, NUM_CLASES_PER_CLIENT, ENCODER,
 
     train_dataloaders, test_dataloaders = gen_random_loaders(DATA_NAME, '~/torch_data', NUM_CLIENTS,
                                                              BATCH_SIZE, NUM_CLASES_PER_CLIENT, NUM_CLASSES, preprocess)
-    os.makedirs(f'feature/{DATA_NAME}_{NUM_CLASES_PER_CLIENT}cpc_{NUM_CLIENTS}client_{ENCODER}/', exist_ok=True)
+    os.makedirs(f'{path}/', exist_ok=True)
     print('=====> model loaded')
     print('=====> start extracting')
 
@@ -45,8 +45,8 @@ def extract(DATA_NAME, NUM_CLIENTS, NUM_CLASSES, NUM_CLASES_PER_CLIENT, ENCODER,
             y_train.append(y)
         features_train = np.concatenate(features_train, axis=0)
         y_train = np.concatenate(y_train, axis=0)
-        np.save(f'feature/{DATA_NAME}_{NUM_CLASES_PER_CLIENT}cpc_{NUM_CLIENTS}client_{ENCODER}/{index}_train_x.npy', features_train)
-        np.save(f'feature/{DATA_NAME}_{NUM_CLASES_PER_CLIENT}cpc_{NUM_CLIENTS}client_{ENCODER}/{index}_train_y.npy', y_train)
+        np.save(f'{path}/{index}_train_x.npy', features_train)
+        np.save(f'{path}/{index}_train_y.npy', y_train)
         features_test = []
         y_test = []
         for x, y in test_dataloaders[index]:
@@ -58,6 +58,6 @@ def extract(DATA_NAME, NUM_CLIENTS, NUM_CLASSES, NUM_CLASES_PER_CLIENT, ENCODER,
             y_test.append(y)
         features_test = np.concatenate(features_test, axis=0)
         y_test = np.concatenate(y_test, axis=0)
-        np.save(f'feature/{DATA_NAME}_{NUM_CLASES_PER_CLIENT}cpc_{NUM_CLIENTS}client_{ENCODER}/{index}_test_x.npy', features_test)
-        np.save(f'feature/{DATA_NAME}_{NUM_CLASES_PER_CLIENT}cpc_{NUM_CLIENTS}client_{ENCODER}/{index}_test_y.npy', y_test)
+        np.save(f'{path}/{index}_test_x.npy', features_test)
+        np.save(f'{path}/{index}_test_y.npy', y_test)
     print('=====> finish extracting')
