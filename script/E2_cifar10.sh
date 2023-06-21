@@ -5,7 +5,7 @@ python FedTransfer.py --data='cifar10' --nclient=100 --nclass=10 --ncpc=2 --enco
 python FedTransfer.py --data='cifar10' --nclient=100 --nclass=10 --ncpc=2 --encoder='simclr' --model='linear_model_DN_IN' --mode='CDP' --round=20 --epsilon=8 --sr=1 --lr=1e-1 --flr=1e-1 --physical_bs=64 --E=2 --bs=64
 python FedTransfer.py --data='cifar10' --nclient=100 --nclass=10 --ncpc=2 --encoder='resnext' --model='linear_model_DN_IN' --mode='CDP' --round=20 --epsilon=8 --sr=1 --lr=1e-2 --flr=1e-1 --physical_bs=64 --E=2 --bs=64
 
-python FedTransfer.py --data='cifar10' --nclient=100 --naclass=10 --ncpc=2 --encoder='clip' --model='linear_model_DN_IN' --mode='CDP' --round=5 --epsilon=2 --sr=1 --lr=1e-1 --flr=1e-1 --physical_bs=64 --E=2 --bs=64
+python FedTransfer.py --data='cifar10' --nclient=100 --nclass=10 --ncpc=2 --encoder='clip' --model='linear_model_DN_IN' --mode='CDP' --round=5 --epsilon=2 --sr=1 --lr=1e-1 --flr=1e-1 --physical_bs=64 --E=2 --bs=64
 python FedTransfer.py --data='cifar10' --nclient=100 --nclass=10 --ncpc=2 --encoder='simclr' --model='linear_model_DN_IN' --mode='CDP' --round=5 --epsilon=2 --sr=1 --lr=1e-1 --flr=1e-1 --physical_bs=64 --E=2 --bs=64
 python FedTransfer.py --data='cifar10' --nclient=100 --nclass=10 --ncpc=2 --encoder='resnext' --model='linear_model_DN_IN' --mode='CDP' --round=5 --epsilon=2 --sr=1 --lr=1e-2 --flr=1e-1 --physical_bs=64 --E=2 --bs=64
 

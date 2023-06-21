@@ -66,7 +66,10 @@ class resnet18_IN(torch.nn.Module):
         self.backbone = torchvision.models.resnet18(pretrained=True)
         n_ftrs = self.backbone.fc.in_features
         self.backbone.fc = torch.nn.Linear(n_ftrs, num_classes)
-        self.norm = InputNorm(3, 120)
+        if num_classes == 8:
+            self.norm = InputNorm(3, 150)
+        else:
+            self.norm = InputNorm(3, 120)
     def forward(self, x):
         x = self.norm(x)
         logits = self.backbone(x)
@@ -94,7 +97,7 @@ class alexnet_IN(torch.nn.Module):
         self.backbone = torchvision.models.alexnet(pretrained=True)
         n_ftrs = self.backbone.classifier[-1].out_features
         self.fc = torch.nn.Linear(n_ftrs, num_classes)
-        self.norm = InputNorm(3, 120)
+        self.norm = InputNorm(3, 150)
     def forward(self, x):
         x = self.norm(x)
         logits = self.backbone(x)
