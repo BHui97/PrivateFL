@@ -23,7 +23,7 @@ if E == 1:
         for file in files:
             if file.endswith('.csv'):
                path = os.path.join(root, file)
-               if data in path:
+               if data in path.split('_')[0].split('/'):
                    df = pd.read_csv(path, header=None)
                    new_header = df.iloc[0]
                    df = df[1:]
@@ -33,7 +33,7 @@ if E == 1:
                         "epsilon": df["epsilon"].values[0], "accuracy": df["accuracy"].values[0]},
                        ignore_index=True)
     print(f'==> The results for {data} in E{E} is:')
-    print(results_df.sort_values(by = 'mode').reset_index(drop=True))
+    print(results_df.sort_values(by = ['mode', 'epsilon']).reset_index(drop=True))
 
 
 elif E == 2:
@@ -43,7 +43,7 @@ elif E == 2:
         for file in files:
             if file.endswith('.csv'):
                path = os.path.join(root, file)
-               if data in path:
+               if data in path.split('_')[0].split('/'):
                    df = pd.read_csv(path, header=None)
                    new_header = df.iloc[0]
                    df = df[1:]
@@ -53,7 +53,7 @@ elif E == 2:
                         "model": df["model"].values[0], "epsilon": df["epsilon"].values[0], "accuracy": df["accuracy"].values[0]},
                        ignore_index=True)
     print(f'==> The results for {data} in E{E} is:')
-    print(results_df.sort_values(by = 'model').reset_index(drop=True))
+    print(results_df.sort_values(by =  ['model', 'mode', 'epsilon']).reset_index(drop=True))
 
 elif E == 3:
     results_df = pd.DataFrame(columns=["data", "mode", "ncpc", "accuracy"])
@@ -72,7 +72,7 @@ elif E == 3:
                          "ncpc": df["ncpc"].values[0], "accuracy": df["accuracy"].values[0]},
                         ignore_index=True)
     print(f'==> The results for {data} in E{E} is:')
-    print(results_df.sort_values(by='mode').reset_index(drop=True))
+    print(results_df.sort_values(by = ['mode', 'epsilon']).reset_index(drop=True))
 
 else:
     results_df = pd.DataFrame(columns=["data", "mode", "nc", "accuracy"])
@@ -91,7 +91,7 @@ else:
                          "nc": df["num_client"].values[0], "accuracy": df["accuracy"].values[0]},
                         ignore_index=True)
     print(f'==> The results for {data} in E{E} is:')
-    print(results_df.sort_values(by='mode').reset_index(drop=True))
+    print(results_df.sort_values(by = ['mode', 'epsilon']).reset_index(drop=True))
 
 
 
