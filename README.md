@@ -40,4 +40,17 @@ Run the following script to extract features from [ResNeXt, SimCLR, CLIP] and tr
 ```bash
 bash fedtransfer.sh
 ```
-Please reduce the value of 'max_physical_batch_size' in BatchMemoryManager (FedUser/LDPUser) if facing CUDA out of memory.
+Please reduce the value of --physical_bs if facing CUDA out of memory.
+
+## Citation
+
+```
+@inproceedings{yangprivatefl,
+  title={PrivateFL: Accurate, Differentially Private Federated Learning via Personalized Data Transformation},
+  author={Yang, Yuchen and Hui, Bo and Yuan, Haolin and Gong, Neil and Cao, Yinzhi}
+  booktitle = {Proceedings of the USENIX Security Symposium (Usenix'23)},
+  year = {2023}
+}
+```
+
+
