@@ -15,7 +15,7 @@ def parse_arguments():
     parser.add_argument('--nclient', type=int, default= 100)
     parser.add_argument('--nclass', type=int, help= 'the number of class for this dataset', default= 10)
     parser.add_argument('--ncpc', type=int, help= 'the number of class assigned to each client', default=2)
-    parser.add_argument('--model', type=str, default='mnist_fully_connected_IN', choices = ['mnist_fully_connected_IN', 'resnet18_IN', 'alexnet_IN', 'purchase_fully_connected_IN'])
+    parser.add_argument('--model', type=str, default='mnist_fully_connected_IN', choices = ['mnist_fully_connected_IN', 'resnet18_IN', 'alexnet_IN', 'purchase_fully_connected_IN', 'mnist_fully_connected', 'resnet18', 'alexnet', 'purchase_fully_connected'])
     parser.add_argument('--mode', type=str, default= 'LDP')
     parser.add_argument('--round',  type = int, default= 150)
     parser.add_argument('--epsilon', type=int, default=8)
