@@ -1,6 +1,6 @@
 start=$(date +%s)
 cd .. &&
-python FedAverage.py --data='chmnist' --nclient=40 --nclass=8 --ncpc=2 --model='alexnet' --mode='CDP' --round=60 --epsilon=2 --sr=0.8 --lr=1e-4 --flr=1e-1 --physical_bs=3 --E=1
+python FedAverage.py --data='chmnist' --nclient=40 --nclass=8 --ncpc=2 --model='alexnet' --mode='CDP' --round=50 --epsilon=2 --sr=0.8 --lr=5e-5 --flr=1e-1 --physical_bs=3 --E=1
 python FedAverage.py --data='chmnist' --nclient=40 --nclass=8 --ncpc=2 --model='alexnet' --mode='CDP' --round=120 --epsilon=4 --sr=0.8 --lr=1e-4 --flr=1e-1 --physical_bs=3 --E=1
 python FedAverage.py --data='chmnist' --nclient=40 --nclass=8 --ncpc=2 --model='alexnet' --mode='CDP' --round=150 --epsilon=6 --sr=0.8 --lr=1e-4 --flr=1e-1 --physical_bs=3 --E=1
 python FedAverage.py --data='chmnist' --nclient=40 --nclass=8 --ncpc=2 --model='alexnet' --mode='CDP' --round=150 --epsilon=8 --sr=0.8 --lr=1e-4 --flr=1e-1 --physical_bs=3 --E=1
