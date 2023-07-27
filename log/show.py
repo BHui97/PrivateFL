@@ -86,7 +86,7 @@ elif E == 3:
                          "ncpc": df["ncpc"].values[0], "accuracy": df["accuracy"].values[0]},
                         ignore_index=True)
     print(f'==> The results for {data} in E{E} is:')
-    print(results_df.sort_values(by = ['mode', 'epsilon']).reset_index(drop=True))
+    print(results_df.sort_values(by = ['mode', "ncpc"]).reset_index(drop=True))
 
 else:
     results_df = pd.DataFrame(columns=["data", "mode", "nc", "accuracy"])
@@ -105,7 +105,7 @@ else:
                          "nc": df["num_client"].values[0], "accuracy": df["accuracy"].values[0]},
                         ignore_index=True)
     print(f'==> The results for {data} in E{E} is:')
-    print(results_df.sort_values(by = ['mode', 'epsilon']).reset_index(drop=True))
+    print(results_df.sort_values(by = ['mode', "nc"]).reset_index(drop=True))
 
 
 
