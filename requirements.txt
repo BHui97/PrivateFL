@@ -47,7 +47,6 @@ Jinja2==3.1.2
 joblib==1.1.0
 kiwisolver==1.4.2
 lightning-cloud==0.5.30
-lightning-utilities==0.7.1
 lxml==4.9.1
 Markdown==3.3.7
 markdown-it-py==2.2.0
