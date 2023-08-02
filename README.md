@@ -1,6 +1,6 @@
 # PrivateFL: Accurate, Differentially Private Federated Learning via Personalized Data Transformation
 
-This is the Pytorch implementaion of our paper, PrivateFL: Accurate, Differentially Private Federated Learning via Personalized Data Transformation.
+This is the Pytorch implementation of our paper, PrivateFL: Accurate, Differentially Private Federated Learning via Personalized Data Transformation.
 
 ## Experiment Setup
 
@@ -35,7 +35,7 @@ You can also change the parameters in script/train.sh, e.g., --data --nclient --
 
 ### Train with frozen encoder
 
-Run the following script to extract features from [ResNeXt, SimCLR, CLIP] and train a one-layer classifier:
+Run the following script to extract features from [ResNeXt, SimCLR, CLIP] and train a one-layer classifier, you may need to download ResNext using [this link](https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdrive.google.com%2Ffile%2Fd%2F1v-ZOPhSHaP1DGygMn4B3AHBKKiQRb4sz%2Fview%3Fusp%3Ddrive_link&data=05%7C01%7Cyc.yang%40jhu.edu%7C1fcd39208359468a92cf08db9348949d%7C9fa4f438b1e6473b803f86f8aedf0dec%7C0%7C0%7C638265712203751267%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=ZJLMpgA%2F0GUB2DwIhmPSjNsmSBUbGT20nSzI9PIAB6k%3D&reserved=0):
 
 ```bash
 bash fedtransfer.sh
