@@ -50,15 +50,16 @@ class CDPServer:
                         self.model.state_dict()[k].data.copy_(value.detach().clone())
             else:
                 for k, v in self.get_model_state_dict().items():
-                    sumed_grad = torch.zeros_like(v)
-                    for i in range(len(weights)):
-                        grad = weights[i][k]-v
-                        grad = grad*min(1, norms[k]/grad.norm(2))
-                        sumed_grad += grad
-                    sigma = norms[k]*self.noise_multiplier
-                    sumed_grad += torch.normal(0, sigma, v.shape)
-                    value = v + sumed_grad/self.sample_clients
-                    self.model.state_dict()[k].data.copy_(value.detach().clone())
+                    if 'bn' not in k:
+                        sumed_grad = torch.zeros_like(v)
+                        for i in range(len(weights)):
+                            grad = weights[i][k]-v
+                            grad = grad*min(1, norms[k]/grad.norm(2))
+                            sumed_grad += grad
+                        sigma = norms[k]*self.noise_multiplier
+                        sumed_grad += torch.normal(0, sigma, v.shape)
+                        value = v + sumed_grad/self.sample_clients
+                        self.model.state_dict()[k].data.copy_(value.detach().clone())
 
 
 class LDPServer(CDPServer):
@@ -84,10 +85,11 @@ class LDPServer(CDPServer):
                         self.model.state_dict()[k].data.copy_(value.detach().clone())
             else:
                 for k, v in self.get_model_state_dict().items():
-                    sumed_grad = torch.zeros_like(v)
-                    for i in range(len(weights)):
-                        grad = weights[i][k]-v
-                        sumed_grad += grad
-                    value = v + sumed_grad/self.sample_clients
-                    self.model.state_dict()[k].data.copy_(value.detach().clone())
+                    if 'bn' not in k:
+                        sumed_grad = torch.zeros_like(v)
+                        for i in range(len(weights)):
+                            grad = weights[i][k]-v
+                            sumed_grad += grad
+                        value = v + sumed_grad/self.sample_clients
+                        self.model.state_dict()[k].data.copy_(value.detach().clone())
 

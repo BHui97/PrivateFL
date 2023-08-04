@@ -78,7 +78,8 @@ class CDPUser:
                     self.model.state_dict()[key].data.copy_(weights[key])
         else:
             for key, value in self.model.state_dict().items():
-                self.model.state_dict()[key].data.copy_(weights[key])
+                if 'bn' not in key:
+                    self.model.state_dict()[key].data.copy_(weights[key])
 
 class LDPUser(CDPUser):
     def __init__(self, index, device, model, n_classes, input_shape, train_dataloader, epochs, rounds, target_epsilon, target_delta, sr, max_norm=2.0, disc_lr=5e-1, mp_bs = 3):
